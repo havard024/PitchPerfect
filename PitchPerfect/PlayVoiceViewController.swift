@@ -34,6 +34,13 @@ class PlayVoiceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupAudio()
+        
+        // Hide back button since view has custom back button inside the view
+        navigationItem.hidesBackButton = true
+        
+        // Set title to fill empty navigation bar
+        navigationItem.title = "Pitch Perfect"
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -67,7 +74,7 @@ class PlayVoiceViewController: UIViewController {
     }
     
     @IBAction func recordANewSoundClicked(_ sender: Any) {
-        performSegue(withIdentifier: "back", sender: nil)
+        self.navigationController?.popViewController(animated: true)
     }
     
 }
