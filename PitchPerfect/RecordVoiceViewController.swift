@@ -13,6 +13,10 @@ enum recordVoiceText: String {
     case start = "Tap to start recording"
 }
 
+enum uiState {
+    
+}
+
 class RecordVoiceViewController: UIViewController, AVAudioRecorderDelegate {
 
     var audioRecorder: AVAudioRecorder!
@@ -23,8 +27,10 @@ class RecordVoiceViewController: UIViewController, AVAudioRecorderDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.recordVoiceLabel.text = recordVoiceText.start.rawValue
-        self.stopRecordButton.isHidden = true
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        configureUI(false)
     }
 
     override func didReceiveMemoryWarning() {
@@ -32,12 +38,16 @@ class RecordVoiceViewController: UIViewController, AVAudioRecorderDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    func configureUI(_ isRecording: Bool) {
+        self.stopRecordButton.isHidden = !isRecording
+        self.startRecordButton.isHidden = isRecording
+        self.recordVoiceLabel.text = isRecording ? recordVoiceText.stop.rawValue : recordVoiceText.start.rawValue
+    }
+    
     @IBAction func startRecording() {
         print("Start Recording.")
         self.recordVoiceLabel.text = recordVoiceText.stop.rawValue
-        self.stopRecordButton.isHidden = false
-        self.startRecordButton.isHidden = true
-        
+        configureUI(true)
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask, true)[0] as String
         let recordingName = "recordedVoice.wav"
         let pathArray = [dirPath, recordingName]
@@ -53,11 +63,8 @@ class RecordVoiceViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @IBAction func stopRecording() {
+        // NOTE: Not configuring UI back to notRecording state to prevent UI from changing while transitioning. Instead The notRecording state is reset when user transitions back from the next view
         print("Stop Recording.")
-        self.recordVoiceLabel.text = recordVoiceText.start.rawValue
-        self.stopRecordButton.isHidden = true
-        self.startRecordButton.isHidden = false
-        
         audioRecorder.stop()
         let audioSession = AVAudioSession.sharedInstance()
         try! audioSession.setActive(false)
